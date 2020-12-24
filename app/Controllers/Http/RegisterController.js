@@ -2,12 +2,6 @@
 const User = use('App/Models/User');
 
 /** @type {typeof import('@adonisjs/lucid/src/Lucid/Model')} */
-const Student = use('App/Models/Student');
-
-/** @type {typeof import('@adonisjs/lucid/src/Lucid/Model')} */
-const Teacher = use('App/Models/Teacher');
-
-/** @type {typeof import('@adonisjs/lucid/src/Lucid/Model')} */
 const Permission = use('App/Models/Permission');
 
 const { validate } = use('Validator');
@@ -61,9 +55,10 @@ class RegisterController {
       }
       // eslint-disable-next-line no-underscore-dangle
       const error = validation._errorMessages[0];
-      response.status(200);
+      response.status(400);
       return { error };
     } catch (error) {
+      // Eu acredito que com o validator, nunca cairemos aqui
       return { message: error };
     }
   }
