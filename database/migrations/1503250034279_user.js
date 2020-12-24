@@ -16,6 +16,7 @@ class UserSchema extends Schema {
       table.string('city').notNullable();
       table.boolean('isTeacher').notNullable();
       table.boolean('status').defaultTo(false);
+      table.text('about');
       table.timestamps();
     });
   }
