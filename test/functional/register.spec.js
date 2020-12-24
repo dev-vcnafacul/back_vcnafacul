@@ -49,7 +49,6 @@ test('register missing the city', async ({ client, assert }) => {
   const response = await client.post('/register').send(newUser).end();
 
   response.assertStatus(400);
-  console.log(response.body.error);
 
   assert.equal(response.body.error.field, 'city');
 });
