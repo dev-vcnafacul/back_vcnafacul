@@ -83,8 +83,6 @@ class QuestionsSchema extends Schema {
       // Possível imagem que pode ter a Pergunta
       table.string('image');
       // Qual vestibular essa questão apareceu
-      table.string('exam').notNullable();
-      // Em qual ano ?
       table
         .enum('year', [
           2000,
@@ -111,6 +109,8 @@ class QuestionsSchema extends Schema {
           2021,
         ])
         .notNullable();
+      // Em qual ano ?
+      table.integer('year').notNullable();
       table
         .enum('status', ['aprovada', 'reprovada', 'pendente'])
         .default('pendente');
