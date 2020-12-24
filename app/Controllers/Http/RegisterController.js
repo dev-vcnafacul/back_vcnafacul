@@ -52,11 +52,6 @@ class RegisterController {
     try {
       if (!validation.fails()) {
         const user = await User.create(data);
-        if (data.isTeacher) {
-          await Teacher.create({ user_id: user.id });
-        } else {
-          await Student.create({ user_id: user.id });
-        }
         await Permission.create({
           user_id: user.id,
           ...permission,
