@@ -1,6 +1,6 @@
 const faker = require('faker');
 
-const { test, trait, after } = use('Test/Suite')('Question Register');
+const { test, trait, after, before } = use('Test/Suite')('Question Register');
 
 trait('Test/ApiClient');
 trait('DatabaseTransactions');
@@ -8,7 +8,14 @@ trait('DatabaseTransactions');
 /** @type {typeof import('@adonisjs/lucid/src/Lucid/Model')} */
 const User = use('App/Models/User');
 
+/** @type {typeof import('@adonisjs/lucid/src/Lucid/Model')} */
+const Exam = use('App/Models/Exam');
+
 // Preparando definição antes de começar os testes
+
+before(async () => {
+  await Exam.create({ exam: 'Enem', location: 'BR' });
+});
 
 after((done) => {
   done();
@@ -22,7 +29,7 @@ function createquestion() {
       1
     )[0],
     year: 2020,
-    exam: 'enem',
+    examId: 1,
     subjects: faker.random.arrayElements(
       [
         'História',
@@ -191,4 +198,31 @@ test('it show all questions of some status', async ({ client, assert }) => {
     .end();
 
   assert.equal(questVerifica.body[0].question.status, 'aprovada');
+});
+
+test('it should create a question with a exam does not exist', async ({
+  client,
+}) => {
+  // chama uma função que cadastra e faz o login
+
+  const token = await login(client);
+
+  // Criando uma função faker
+
+  const newquestion = createquestion();
+
+  newquestion.examId = 2;
+
+  // E agora vamos cadastrar essa questão
+  // passando o token de autenticação.
+
+  const questionResponse = await client
+    .post('/registerquestion')
+    .send(newquestion)
+    .header('Authorization', `Bearer ${token}`)
+    .end();
+
+  questionResponse.assertStatus(404);
+
+  // console.log(questionResponse.body);
 });

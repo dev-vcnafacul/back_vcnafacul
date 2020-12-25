@@ -7,6 +7,9 @@ const Permission = use('App/Models/Permission');
 /** @type {typeof import('@adonisjs/lucid/src/Lucid/Model')} */
 const Answer = use('App/Models/Answer');
 
+/** @type {typeof import('@adonisjs/lucid/src/Lucid/Model')} */
+const Exam = use('App/Models/Exam');
+
 /**
   @typedef {import('@adonisjs/framework/src/Request')} Request
   @typedef {import('@adonisjs/framework/src/View')} View
@@ -36,7 +39,7 @@ class QuestionController {
         question,
         enemArea,
         year,
-        exam,
+        examId,
         frente,
         subjects,
         answerCorrect,
@@ -45,7 +48,7 @@ class QuestionController {
         'question',
         'enemArea',
         'year',
-        'exam',
+        'examId',
         'frente',
         'subjects',
         'answerCorrect',
@@ -58,9 +61,16 @@ class QuestionController {
         enemArea,
         subjects,
         year,
-        exam,
+        examId,
         frente,
       };
+
+      const exam = await Exam.findBy('id', examId);
+
+      if (!exam) {
+        response.status(404);
+        return { error: 'Vestibular não cadastrado' };
+      }
 
       try {
         const quest = await Question.create(newquest);
