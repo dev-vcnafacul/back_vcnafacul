@@ -89,7 +89,7 @@ function createquestion() {
   };
 }
 
-async function login(client) {
+async function login(client, isTeacher) {
   const newUser = {
     email: 'fernando.almeida.pinto@gmail.com',
     password: '123456',
@@ -100,7 +100,7 @@ async function login(client) {
     birthday: '26/06/1989',
     state: 'SP',
     city: 'São Paulo',
-    isTeacher: true,
+    isTeacher: isTeacher,
   };
 
   // Requisição para o cadastro passando o newUser
@@ -131,7 +131,7 @@ test('it should create a question being a teacher', async ({
 }) => {
   // chama uma função que cadastra e faz o login
 
-  const token = await login(client);
+  const token = await login(client, true);
 
   // Criando uma função faker
 
@@ -160,7 +160,7 @@ test('it should create a question being a teacher', async ({
 });
 
 test('it show all questions of some status', async ({ client, assert }) => {
-  const token = await login(client);
+  const token = await login(client, true);
 
   const newquestion = createquestion();
 
@@ -205,7 +205,7 @@ test('it should create a question with a exam does not exist', async ({
 }) => {
   // chama uma função que cadastra e faz o login
 
-  const token = await login(client);
+  const token = await login(client, true);
 
   // Criando uma função faker
 
