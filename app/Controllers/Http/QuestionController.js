@@ -100,7 +100,18 @@ class QuestionController {
     }
   }
 
-  async show({ request }) {
+  async show({ auth, request, response }) {
+    const perm = await Permission.query()
+      .where('user_id', auth.user.id)
+      .fetch();
+
+    const permission = perm.toJSON()[0];
+
+    if (!permission.buscarQuestoes) {
+      response.status(404);
+      return { error: 'Not authorization' };
+    }
+
     const { status } = request.only(['status']);
 
     const ArrayQuestion = [];

@@ -49,11 +49,7 @@ class User extends Model {
         aprovarQuestoes: true,
       };
     }
-    return {
-      cadastroQuestao: false,
-      buscarQuestoes: false,
-      aprovarQuestoes: false,
-    };
+    return {};
   }
 }
 

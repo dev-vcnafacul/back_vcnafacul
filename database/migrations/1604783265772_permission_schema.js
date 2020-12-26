@@ -12,10 +12,10 @@ class PermissionSchema extends Schema {
         .onUpdate('CASCADE')
         .onDelete('CASCADE')
         .primary();
+      table.boolean('validacao_email').default(true);
       table.boolean('cadastroQuestao').default(false);
       table.boolean('buscarQuestoes').default(false);
       table.boolean('aprovarQuestoes').default(false);
-      table.boolean('searchQuestion').default(true);
       table.timestamps();
     });
   }
