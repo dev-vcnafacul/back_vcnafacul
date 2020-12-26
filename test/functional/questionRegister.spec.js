@@ -11,6 +11,9 @@ const User = use('App/Models/User');
 /** @type {typeof import('@adonisjs/lucid/src/Lucid/Model')} */
 const Exam = use('App/Models/Exam');
 
+/** @type {typeof import('@adonisjs/lucid/src/Lucid/Model')} */
+const Question = use('App/Models/Question');
+
 // Preparando definição antes de começar os testes
 
 before(async () => {
@@ -100,7 +103,7 @@ async function login(client, isTeacher) {
     birthday: '26/06/1989',
     state: 'SP',
     city: 'São Paulo',
-    isTeacher: isTeacher,
+    isTeacher,
   };
 
   // Requisição para o cadastro passando o newUser
@@ -181,23 +184,6 @@ test('it show all questions of some status', async ({ client, assert }) => {
   questPendente.assertStatus(200);
 
   assert.isNotNull(questPendente.body[0].answer[1]);
-
-  const changeResponse = await client
-    .patch(
-      `/changestatusquestion/${questPendente.body[0].question.id}/aprovada`
-    )
-    .header('Authorization', `Bearer ${token}`)
-    .end();
-
-  changeResponse.assertStatus(204);
-
-  const questVerifica = await client
-    .post('/showquestion')
-    .send({ status: 'aprovada' })
-    .header('Authorization', `Bearer ${token}`)
-    .end();
-
-  assert.equal(questVerifica.body[0].question.status, 'aprovada');
 });
 
 test('it should create a question with a exam does not exist', async ({
@@ -225,4 +211,34 @@ test('it should create a question with a exam does not exist', async ({
   questionResponse.assertStatus(404);
 
   // console.log(questionResponse.body);
+});
+
+test('it should change status question from pendente to aprovada/reprovada', async ({
+  assert,
+  client,
+}) => {
+  const newquestion = createquestion();
+
+  const token = await login(client, true);
+
+  const question = await client
+    .post('/registerquestion')
+    .send(newquestion)
+    .header('Authorization', `Bearer ${token}`)
+    .end();
+
+  const OldQuestion = await Question.findByOrFail('id', question.body.id);
+
+  assert.equal(OldQuestion.toJSON().status, 'pendente');
+
+  const newstatus = 'aprovada';
+
+  await client
+    .patch(`/changestatusquestion/${question.body.id}/${newstatus}`)
+    .header('Authorization', `Bearer ${token}`)
+    .end();
+
+  const Newquestion = await Question.findByOrFail('id', question.body.id);
+
+  assert.equal(Newquestion.toJSON().status, newstatus);
 });

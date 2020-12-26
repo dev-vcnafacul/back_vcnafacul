@@ -24,90 +24,87 @@ class QuestionController {
    * @param {View} ctx.view
    */
 
+  async PermissionVerification(auth, myPerm) {
+    const perm = await Permission.query()
+      .where('user_id', auth.user.id)
+      .fetch();
+
+    const permission = perm.toJSON()[0];
+
+    return permission[myPerm];
+  }
+
   // Essa requisição é responsável por cadastro de questões.
   // Verificar quem tem atribuição de cadastro. Para isso Olhar na Tabela de Permissões.
 
   async store({ request, auth, response }) {
-    const perm = await Permission.query()
-      .where('user_id', auth.user.id)
-      .fetch();
+    if (!this.PermissionVerification(auth, 'cadastroQuestao')) {
+      response.status(404);
+      return { error: 'Not authorization' };
+    }
+    const {
+      question,
+      enemArea,
+      year,
+      examId,
+      frente,
+      subjects,
+      answerCorrect,
+      answerWrong,
+    } = request.only([
+      'question',
+      'enemArea',
+      'year',
+      'examId',
+      'frente',
+      'subjects',
+      'answerCorrect',
+      'answerWrong',
+    ]);
 
-    const permission = perm.toJSON()[0];
+    const newquest = {
+      user_id: auth.user.id,
+      question,
+      enemArea,
+      subjects,
+      year,
+      examId,
+      frente,
+    };
 
-    if (permission.cadastroQuestao) {
-      const {
-        question,
-        enemArea,
-        year,
-        examId,
-        frente,
-        subjects,
-        answerCorrect,
-        answerWrong,
-      } = request.only([
-        'question',
-        'enemArea',
-        'year',
-        'examId',
-        'frente',
-        'subjects',
-        'answerCorrect',
-        'answerWrong',
-      ]);
+    const exam = await Exam.findBy('id', examId);
 
-      const newquest = {
-        user_id: auth.user.id,
-        question,
-        enemArea,
-        subjects,
-        year,
-        examId,
-        frente,
-      };
+    if (!exam) {
+      response.status(404);
+      return { error: 'Vestibular não cadastrado' };
+    }
 
-      const exam = await Exam.findBy('id', examId);
+    try {
+      const quest = await Question.create(newquest);
 
-      if (!exam) {
-        response.status(404);
-        return { error: 'Vestibular não cadastrado' };
-      }
-
-      try {
-        const quest = await Question.create(newquest);
-
-        await Answer.create({
-          question_id: quest.id,
-          answer: answerCorrect,
-          correct: true,
-        });
-        await Promise.all(
-          answerWrong.map(async (elem) => {
-            await Answer.create({
-              question_id: quest.id,
-              answer: elem,
-            });
-          })
-        );
-        response.status(200);
-        return quest;
-      } catch (error) {
-        response.status(400);
-        return { error };
-      }
-    } else {
-      response.status(401);
-      return { message: 'Permission denied' };
+      await Answer.create({
+        question_id: quest.id,
+        answer: answerCorrect,
+        correct: true,
+      });
+      await Promise.all(
+        answerWrong.map(async (elem) => {
+          await Answer.create({
+            question_id: quest.id,
+            answer: elem,
+          });
+        })
+      );
+      response.status(200);
+      return quest;
+    } catch (error) {
+      response.status(400);
+      return { error };
     }
   }
 
   async show({ auth, request, response }) {
-    const perm = await Permission.query()
-      .where('user_id', auth.user.id)
-      .fetch();
-
-    const permission = perm.toJSON()[0];
-
-    if (!permission.buscarQuestoes) {
+    if (!this.PermissionVerification(auth, 'aprovarQuestoes')) {
       response.status(404);
       return { error: 'Not authorization' };
     }
@@ -132,10 +129,17 @@ class QuestionController {
     return ArrayQuestion;
   }
 
-  async changestatusquestion({ params }) {
+  async changestatusquestion({ auth, params, response }) {
+    if (!this.PermissionVerification(auth, 'aprovarQuestoes')) {
+      response.status(404);
+      return { error: 'Not authorization' };
+    }
+
     const { id, status } = params;
 
     await Question.query().where('id', id).update({ status });
+    response.status(200);
+    return { message: 'Sucess' };
   }
 }
 
