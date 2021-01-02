@@ -158,8 +158,10 @@ test('it show all questions of some status', async ({ client, assert }) => {
   const token = await login(client, true);
 
   const q1 = createquestion();
+  const q2 = createquestion();
   let array = [];
   array = array.concat(q1);
+  array = array.concat(q2);
 
   const questRegister = await client
     .post('/registerquestion')
@@ -177,7 +179,7 @@ test('it show all questions of some status', async ({ client, assert }) => {
 
   questPendente.assertStatus(200);
 
-  assert.isNotNull(questPendente.body[0].answer[1]);
+  assert.isTrue(questPendente.body[0].answer.length === 5);
 });
 
 test('it should create a question with a exam does not exist', async ({

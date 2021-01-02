@@ -135,13 +135,24 @@ class QuestionController {
     const questreturn = await Question.query().where('status', status).fetch();
     const quest = questreturn.toJSON();
     await Promise.all(
-      quest.map(async (element) => {
+      quest.map(async (elem) => {
         const answer = await Answer.query()
-          .where('question_id', element.id)
+          .where('question_id', elem.id)
           .fetch();
+        const myAnswer = answer.toJSON();
+        const arrayAnswer = [
+          { id: myAnswer[0].id, answer: myAnswer[0].answer },
+          { id: myAnswer[1].id, answer: myAnswer[1].answer },
+          { id: myAnswer[2].id, answer: myAnswer[2].answer },
+          { id: myAnswer[3].id, answer: myAnswer[3].answer },
+          { id: myAnswer[4].id, answer: myAnswer[4].answer },
+        ];
         ArrayQuestion.push({
-          question: element,
-          answer: answer.toJSON(),
+          question: elem.question,
+          Area: elem.enemArea,
+          subjects: elem.subjects,
+          frente: elem.frente,
+          answer: arrayAnswer,
         });
       })
     );
