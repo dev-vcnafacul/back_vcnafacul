@@ -5,6 +5,9 @@ const faker = require('faker');
 const Exam = use('App/Models/Exam');
 
 /** @type {typeof import('@adonisjs/lucid/src/Lucid/Model')} */
+const Question = use('App/Models/Question');
+
+/** @type {typeof import('@adonisjs/lucid/src/Lucid/Model')} */
 const TipoSimulado = use('App/Models/TipoSimulado');
 
 trait('Test/ApiClient');
@@ -140,25 +143,41 @@ test('Registrar um tipo de Simulado', async ({ assert, client }) => {
   assert.isNotNull(Enem);
 });
 
-test('Criar um tipo de Simulado', async ({ assert, client }) => {
+test('Criar um Simulado', async ({ assert, client }) => {
   const token = await login(client, true);
 
   let array = [];
-  for (let i = 0; i < 10; i += 1) {
+  const numberQuestion = 90;
+  for (let i = 0; i < numberQuestion; i += 1) {
     const qt = createquestion();
     array = array.concat(qt);
   }
 
-  const questRegister = await client
+  await client
     .post('/registerquestion')
     .send(array)
     .header('Authorization', `Bearer ${token}`)
     .end();
 
-  for (let i = 0; i < 10; i += 1) {
-    const qt = createquestion();
-    array = array.concat(qt);
+  const newstatus = 'aprovada';
+
+  const results = [];
+
+  for (let i = 0; i < numberQuestion; i += 1) {
+    results.push(async () => {
+      await client
+        .patch(`/changestatusquestion/${i}/${newstatus}`)
+        .header('Authorization', `Bearer ${token}`)
+        .end();
+    });
   }
 
-  console.log(questRegister.body.qtSucess.length);
+  await Promise.all(results.map((elem) => elem()));
+
+  const Newquestion = await Question.findBy(
+    'id',
+    Math.floor(Math.random() * numberQuestion)
+  );
+
+  assert.equal(Newquestion.toJSON().status, newstatus);
 });
