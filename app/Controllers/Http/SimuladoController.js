@@ -1,5 +1,3 @@
-'use strict';
-
 /** @typedef {import('@adonisjs/framework/src/Request')} Request */
 /** @typedef {import('@adonisjs/framework/src/Response')} Response */
 /** @typedef {import('@adonisjs/framework/src/View')} View */
@@ -7,6 +5,9 @@
 /**
  * Resourceful controller for interacting with simulados
  */
+
+/** @type {typeof import('@adonisjs/lucid/src/Lucid/Model')} */
+const TipoSimulado = use('App/Models/TipoSimulado');
 class SimuladoController {
   /**
    * Show a list of all simulados.
@@ -17,7 +18,16 @@ class SimuladoController {
    * @param {Response} ctx.response
    * @param {View} ctx.view
    */
-  async index({ request, response, view }) {}
+  async typeSimulate({ request, response, view }) {
+    const data = request.only(['tipo', 'quantidade_questoes']);
+
+    try {
+      await TipoSimulado.create(data);
+      return response.status(200).json({ msg: 'Tipo de Simulado Criado' });
+    } catch (err) {
+      return response.status(400).json({ error: err });
+    }
+  }
 
   /**
    * Render a form to be used for creating a new simulado.

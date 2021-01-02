@@ -1,14 +1,23 @@
-const { after, test, trait } = use('Test/Suite')('Simulados');
+const { after, before, test, trait } = use('Test/Suite')('Simulados');
 const faker = require('faker');
 
+/** @type {typeof import('@adonisjs/lucid/src/Lucid/Model')} */
+const Exam = use('App/Models/Exam');
+
+/** @type {typeof import('@adonisjs/lucid/src/Lucid/Model')} */
+const TipoSimulado = use('App/Models/TipoSimulado');
+
 trait('Test/ApiClient');
+trait('DatabaseTransactions');
 
-// Eu removi o DatabaseTrasactions pois eu quero carregar os test aqui
-
-/* trait('DatabaseTransactions'); */
+before(async () => {
+  await Exam.create({ exam: 'FUVEST', location: 'SP' });
+  await Exam.create({ exam: 'VUNESP', location: 'BR' });
+});
 
 after((done) => {
   done();
+  // setTimeout(done(), 2000);
 });
 
 function createquestion() {
@@ -19,7 +28,7 @@ function createquestion() {
       1
     )[0],
     year: 2020,
-    examId: 1,
+    examId: faker.random.number({ min: 1, max: 3 }),
     subjects: faker.random.arrayElements(
       [
         'História',
@@ -113,4 +122,43 @@ async function login(client, isTeacher) {
   return token;
 }
 
-test('Registrar um tipo de Simulado', async ({ assert, client }) => {});
+test('Registrar um tipo de Simulado', async ({ assert, client }) => {
+  const token = await login(client, true);
+
+  const simulate = {
+    tipo: 'Enem',
+    quantidade_questoes: 90,
+  };
+
+  await client
+    .post('/registersimulate')
+    .send(simulate)
+    .header('Authorization', `Bearer ${token}`)
+    .end();
+
+  const Enem = await TipoSimulado.findBy('id', 1);
+  assert.isNotNull(Enem);
+});
+
+test('Criar um tipo de Simulado', async ({ assert, client }) => {
+  const token = await login(client, true);
+
+  let array = [];
+  for (let i = 0; i < 10; i += 1) {
+    const qt = createquestion();
+    array = array.concat(qt);
+  }
+
+  const questRegister = await client
+    .post('/registerquestion')
+    .send(array)
+    .header('Authorization', `Bearer ${token}`)
+    .end();
+
+  for (let i = 0; i < 10; i += 1) {
+    const qt = createquestion();
+    array = array.concat(qt);
+  }
+
+  console.log(questRegister.body.qtSucess.length);
+});

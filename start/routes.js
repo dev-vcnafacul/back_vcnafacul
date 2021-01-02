@@ -29,3 +29,7 @@ Route.patch(
   '/changestatusquestion/:id/:status',
   'QuestionController.changestatusquestion'
 ).middleware(['auth']);
+
+Route.post('/registersimulate', 'SimuladoController.typeSimulate').middleware([
+  'auth',
+]);
