@@ -192,7 +192,7 @@ test('it should create a question with a exam does not exist', async ({
   // Criando uma função faker
 
   const q1 = createquestion();
-  q1.examId = 2;
+  q1.examId = 25;
   let array = [];
   array = array.concat(q1);
 
