@@ -6,9 +6,6 @@ trait('Test/ApiClient');
 trait('DatabaseTransactions');
 
 /** @type {typeof import('@adonisjs/lucid/src/Lucid/Model')} */
-const User = use('App/Models/User');
-
-/** @type {typeof import('@adonisjs/lucid/src/Lucid/Model')} */
 const Exam = use('App/Models/Exam');
 
 /** @type {typeof import('@adonisjs/lucid/src/Lucid/Model')} */
@@ -128,24 +125,25 @@ async function login(client, isTeacher) {
 
 // Testes de fato começam aqui
 
-test('it should create a question being a teacher', async ({
-  client,
-  assert,
-}) => {
+test('it should register n questions being a teacher', async ({ client }) => {
   // chama uma função que cadastra e faz o login
 
   const token = await login(client, true);
 
   // Criando uma função faker
 
-  const newquestion = createquestion();
+  const q1 = createquestion();
+  const q2 = createquestion();
+  let array = [];
+  array = array.concat(q1);
+  array = array.concat(q2);
 
   // E agora vamos cadastrar essa questão
   // passando o token de autenticação.
 
   const questionResponse = await client
     .post('/registerquestion')
-    .send(newquestion)
+    .send(array)
     .header('Authorization', `Bearer ${token}`)
     .end();
 
@@ -154,22 +152,20 @@ test('it should create a question being a teacher', async ({
   // Agora precisamos verificar se tudo ocorreu como queriamos
   // Primeiro buscamos nosso usuário cadastrado no banco
   // depois buscamos todas as questões cadastrada por esse usuário
-
-  const user = await User.findBy('email', 'fernando.almeida.pinto@gmail.com');
-
-  const quest = await user.question().where('user_id', user.id).fetch();
-
-  assert.isNotNull(quest.toJSON());
 });
 
 test('it show all questions of some status', async ({ client, assert }) => {
   const token = await login(client, true);
 
-  const newquestion = createquestion();
+  const q1 = createquestion();
+  const q2 = createquestion();
+  let array = [];
+  array = array.concat(q1);
+  array = array.concat(q2);
 
   const questRegister = await client
     .post('/registerquestion')
-    .send(newquestion)
+    .send(array)
     .header('Authorization', `Bearer ${token}`)
     .end();
 
@@ -183,7 +179,7 @@ test('it show all questions of some status', async ({ client, assert }) => {
 
   questPendente.assertStatus(200);
 
-  assert.isNotNull(questPendente.body[0].answer[1]);
+  assert.isTrue(questPendente.body[0].answer.length === 5);
 });
 
 test('it should create a question with a exam does not exist', async ({
@@ -195,50 +191,51 @@ test('it should create a question with a exam does not exist', async ({
 
   // Criando uma função faker
 
-  const newquestion = createquestion();
-
-  newquestion.examId = 2;
+  const q1 = createquestion();
+  q1.examId = 2;
+  let array = [];
+  array = array.concat(q1);
 
   // E agora vamos cadastrar essa questão
   // passando o token de autenticação.
 
   const questionResponse = await client
     .post('/registerquestion')
-    .send(newquestion)
+    .send(array)
     .header('Authorization', `Bearer ${token}`)
     .end();
 
   questionResponse.assertStatus(404);
-
-  // console.log(questionResponse.body);
 });
 
 test('it should change status question from pendente to aprovada/reprovada', async ({
   assert,
   client,
 }) => {
-  const newquestion = createquestion();
+  const q1 = createquestion();
+  let array = [];
+  array = array.concat(q1);
 
   const token = await login(client, true);
 
-  const question = await client
+  await client
     .post('/registerquestion')
-    .send(newquestion)
+    .send(array)
     .header('Authorization', `Bearer ${token}`)
     .end();
 
-  const OldQuestion = await Question.findByOrFail('id', question.body.id);
+  const OldQuestion = await Question.findByOrFail('id', 1);
 
   assert.equal(OldQuestion.toJSON().status, 'pendente');
 
   const newstatus = 'aprovada';
 
   await client
-    .patch(`/changestatusquestion/${question.body.id}/${newstatus}`)
+    .patch(`/changestatusquestion/${1}/${newstatus}`)
     .header('Authorization', `Bearer ${token}`)
     .end();
 
-  const Newquestion = await Question.findByOrFail('id', question.body.id);
+  const Newquestion = await Question.findByOrFail('id', 1);
 
   assert.equal(Newquestion.toJSON().status, newstatus);
 });
