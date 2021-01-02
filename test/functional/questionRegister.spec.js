@@ -6,9 +6,6 @@ trait('Test/ApiClient');
 trait('DatabaseTransactions');
 
 /** @type {typeof import('@adonisjs/lucid/src/Lucid/Model')} */
-const User = use('App/Models/User');
-
-/** @type {typeof import('@adonisjs/lucid/src/Lucid/Model')} */
 const Exam = use('App/Models/Exam');
 
 /** @type {typeof import('@adonisjs/lucid/src/Lucid/Model')} */
