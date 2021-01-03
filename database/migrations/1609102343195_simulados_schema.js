@@ -5,7 +5,7 @@ class SimuladosSchema extends Schema {
   up() {
     this.create('simulados', (table) => {
       table.increments();
-      table.string('name');
+      table.string('name').notNullable();
       table
         .integer('tipo_simulados_id')
         .unsigned()
