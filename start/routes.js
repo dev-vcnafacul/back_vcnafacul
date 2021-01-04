@@ -33,3 +33,5 @@ Route.patch(
 Route.post('/registersimulate', 'SimuladoController.typeSimulate').middleware([
   'auth',
 ]);
+
+Route.post('/criarimulado', 'SimuladoController.create').middleware(['auth']);

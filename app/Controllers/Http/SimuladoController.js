@@ -8,6 +8,15 @@
 
 /** @type {typeof import('@adonisjs/lucid/src/Lucid/Model')} */
 const TipoSimulado = use('App/Models/TipoSimulado');
+
+/** @type {typeof import('@adonisjs/lucid/src/Lucid/Model')} */
+const Simulado = use('App/Models/Simulado');
+
+/** @type {typeof import('@adonisjs/lucid/src/Lucid/Model')} */
+const Question = use('App/Models/Question');
+
+/** @type {typeof import('@adonisjs/lucid/src/Lucid/Model')} */
+const Answer = use('App/Models/Answer');
 class SimuladoController {
   /**
    * Show a list of all simulados.
@@ -18,14 +27,14 @@ class SimuladoController {
    * @param {Response} ctx.response
    * @param {View} ctx.view
    */
-  async typeSimulate({ request, response, view }) {
+  async typeSimulate({ request, response }) {
     const data = request.only(['tipo', 'quantidade_questoes']);
 
     try {
       await TipoSimulado.create(data);
       return response.status(200).json({ msg: 'Tipo de Simulado Criado' });
     } catch (err) {
-      return response.status(400).json({ error: err });
+      return response.status(400).json({ msg: err });
     }
   }
 
@@ -38,7 +47,27 @@ class SimuladoController {
    * @param {Response} ctx.response
    * @param {View} ctx.view
    */
-  async create({ request, response, view }) {}
+  async create({ request, response }) {
+    const { nome, tipo, idQuestoes } = request.only([
+      'nome',
+      'tipo',
+      'idQuestoes',
+    ]);
+
+    const NewSimulado = new Simulado();
+
+    const simulado = await TipoSimulado.query().where('id', tipo).fetch();
+
+    switch (simulado.toJSON()[0].tipo) {
+      case 'Enem':
+        await NewSimulado.enem(idQuestoes);
+        break;
+      case 'Generico':
+        await NewSimulado.genereico(idQuestoes);
+      default:
+        break;
+    }
+  }
 
   /**
    * Create/save a new simulado.
