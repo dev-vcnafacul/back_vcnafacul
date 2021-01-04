@@ -146,8 +146,19 @@ test('Registrar um tipo de Simulado', async ({ assert, client }) => {
 test('Criar um Simulado', async ({ assert, client }) => {
   const token = await login(client, true);
 
+  const simulate = {
+    tipo: 'Enem',
+    quantidade_questoes: 90,
+  };
+
+  await client
+    .post('/registersimulate')
+    .send(simulate)
+    .header('Authorization', `Bearer ${token}`)
+    .end();
+
   let array = [];
-  const numberQuestion = 90;
+  const numberQuestion = 200;
   for (let i = 0; i < numberQuestion; i += 1) {
     const qt = createquestion();
     array = array.concat(qt);
@@ -180,4 +191,22 @@ test('Criar um Simulado', async ({ assert, client }) => {
   );
 
   assert.equal(Newquestion.toJSON().status, newstatus);
+
+  const meuSimuladoResponse = await client
+    .post('/criarimulado')
+    .send({
+      nome: 'Meu Simulado',
+      tipo: 1,
+      idQuestoes: [1, 3, 6],
+    })
+    .header('Authorization', `Bearer ${token}`)
+    .end();
+
+  meuSimuladoResponse.assertStatus(204);
+
+  const myquestteste = await Question.query()
+    .where('frente', 'Botânica e ecologia')
+    .fetch();
+
+  console.log(myquestteste.toJSON());
 });
