@@ -12,7 +12,7 @@ test('it should register a new student', async ({ client, assert }) => {
     password: '123456',
     firstName: 'Fernando',
     lastName: 'Almeida',
-    phone: '11966530488',
+    phone: '(xx)9xxxx-xxxx',
     gender: 'Male',
     birthday: '26/06/1989',
     state: 'SP',
@@ -22,7 +22,7 @@ test('it should register a new student', async ({ client, assert }) => {
 
   const response = await client.post('/register').send(newUser).end();
 
-  assert.equal(response.body.message, 'Registed');
+  assert.equal(response.body.msg, 'Registrado');
 
   response.assertStatus(200);
 
@@ -50,5 +50,5 @@ test('register missing the city', async ({ client, assert }) => {
 
   response.assertStatus(400);
 
-  assert.equal(response.body.error.field, 'city');
+  assert.equal(response.body.msg.field, 'city');
 });
