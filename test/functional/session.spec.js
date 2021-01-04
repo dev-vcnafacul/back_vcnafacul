@@ -18,3 +18,22 @@ test('it should login in aplication', async ({ assert, client }) => {
 
   assert.exists(response.body.token);
 });
+
+test('it not should login in aplication', async ({ assert, client }) => {
+  const sessionPaylod = {
+    email: 'fernando.almeida.pinto@gmail.com',
+    password: '123456',
+  };
+
+  await Factory.model('App/Models/User').create(sessionPaylod);
+
+  const response = await client
+    .post('/session')
+    .send({
+      email: 'fernand.almeida.pinto@gmail.com',
+      password: '123456',
+    })
+    .end();
+
+  response.assertStatus(401);
+});
