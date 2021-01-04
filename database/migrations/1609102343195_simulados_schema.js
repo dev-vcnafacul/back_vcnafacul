@@ -16,6 +16,7 @@ class SimuladosSchema extends Schema {
       table.integer('respondido').notNullable().default(0);
       table.integer('aproveitamento').notNullable().default(0);
       table.json('questions_ids').notNullable();
+      table.boolean('disponivel').default(false);
       table.timestamps();
     });
   }
