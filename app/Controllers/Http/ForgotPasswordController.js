@@ -29,7 +29,7 @@ class ForgotPasswordController {
       (message) => {
         message
           .to(email)
-          .from('equipe@vcnafacul.com')
+          .from('do.not.reply@vcnafacul.com.br')
           .subject('vCnaFacul - Recuperação de senha');
       }
     );
