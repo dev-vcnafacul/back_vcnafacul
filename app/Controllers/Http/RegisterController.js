@@ -51,15 +51,15 @@ class RegisterController {
           ...permission,
         });
         response.status(200);
-        return { message: 'Registed' };
+        return { msg: 'Registrado' };
       }
       // eslint-disable-next-line no-underscore-dangle
       const error = validation._errorMessages[0];
       response.status(400);
-      return { error };
+      return { msg: error };
     } catch (error) {
       // Eu acredito que com o validator, nunca cairemos aqui
-      return { message: error };
+      return { msg: error };
     }
   }
 }

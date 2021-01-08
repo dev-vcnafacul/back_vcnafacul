@@ -13,8 +13,16 @@ class QuestionsSchema extends Schema {
         .inTable('users')
         .onUpdate('CASCADE')
         .onDelete('CASCADE');
+      // Qual vestibular
+      table
+        .integer('examId')
+        .unsigned()
+        .references('id')
+        .inTable('exams')
+        .onUpdate('CASCADE')
+        .onDelete('CASCADE');
       // Pergunta
-      table.text('question', ['mediumtext']).notNullable().unique();
+      table.text('question', ['mediumtext']).notNullable();
       // Areas do Enem, uma boa forma de entender a pergunta
       table
         .enum('enemArea', [
@@ -109,14 +117,6 @@ class QuestionsSchema extends Schema {
           2021,
         ])
         .notNullable();
-      // Qual vestibular
-      table
-        .integer('examId')
-        .unsigned()
-        .references('id')
-        .inTable('exams')
-        .onUpdate('CASCADE')
-        .onDelete('CASCADE');
       table
         .enum('status', ['aprovada', 'reprovada', 'pendente'])
         .default('pendente');

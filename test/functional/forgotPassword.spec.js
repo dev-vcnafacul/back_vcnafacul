@@ -24,7 +24,12 @@ test('it should send mail forgot password', async ({ assert, client }) => {
 
   const user = await Factory.model('App/Models/User').create();
 
-  await client.post('/forgot').send({ email: user.email }).end();
+  const response = await client
+    .post('/forgot')
+    .send({ email: user.email })
+    .end();
+
+  response.assertStatus(204);
 
   const token = await user.tokens().first();
 
@@ -84,6 +89,7 @@ test('it should reset password after 2h of forgot password request', async ({
   response.assertStatus(400);
 });
 
+<<<<<<< HEAD
 test('the generated token is the token received', async () => {
   const user = await Factory.model('App/Models/User').create();
 
@@ -97,4 +103,15 @@ test('the generated token is the token received', async () => {
 
   const userToken = await Token.findByOrFail('token', token);
   
+=======
+test('it send a email invalid', async ({ client }) => {
+  await Factory.model('App/Models/User').create();
+
+  const response = await client
+    .post('/forgot')
+    .send({ email: 'fernando.almeida.pinto@gmail.com' })
+    .end();
+
+  response.assertStatus(404);
+>>>>>>> cadastro
 });

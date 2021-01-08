@@ -25,11 +25,11 @@ class ForgotPasswordController {
 
     await Mail.send(
       'emails/forgotpassword',
-      { name: user.firstName, resetPasswordUrl },
+      { name: user.firstName, token: resetPasswordUrl },
       (message) => {
         message
-          .to(email)
-          .from('equipe@vcnafacul.com')
+          .to(user.email)
+          .from('do.not.reply@vcnafacul.com.br')
           .subject('vCnaFacul - Recuperação de senha');
       }
     );
