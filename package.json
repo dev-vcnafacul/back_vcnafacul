@@ -28,7 +28,7 @@
     "@adonisjs/validator": "^5.0.6",
     "@adonisjs/vow": "^1.0.17",
     "date-fns": "^2.16.1",
-    "pg": "^8.3.3"
+    "mysql": "^2.18.1"
   },
   "devDependencies": {
     "babel-eslint": "^10.1.0",
