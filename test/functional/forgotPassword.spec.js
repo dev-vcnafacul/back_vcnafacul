@@ -1,6 +1,3 @@
-const { randomBytes } = require('crypto');
-const { promisify } = require('util');
-
 const { test, trait } = use('Test/Suite')('Forgot PassWord');
 
 const { subHours } = require('date-fns');
@@ -12,9 +9,6 @@ const Factory = use('Factory');
 
 /** @type {import('@adonisjs/framework/src/Hash')} */
 const Hash = use('Hash');
-
-/** @type {typeof import('@adonisjs/lucid/src/Lucid/Model')} */
-const Token = use('App/Models/Token');
 
 trait('Test/ApiClient');
 trait('DatabaseTransactions');
@@ -89,21 +83,6 @@ test('it should reset password after 2h of forgot password request', async ({
   response.assertStatus(400);
 });
 
-<<<<<<< HEAD
-test('the generated token is the token received', async () => {
-  const user = await Factory.model('App/Models/User').create();
-
-  const random = await promisify(randomBytes)(24);
-  const token = random.toString('hex');
-
-  await user.tokens().create({
-    token,
-    type: 'forgotpassword',
-  });
-
-  const userToken = await Token.findByOrFail('token', token);
-  
-=======
 test('it send a email invalid', async ({ client }) => {
   await Factory.model('App/Models/User').create();
 
@@ -113,5 +92,4 @@ test('it send a email invalid', async ({ client }) => {
     .end();
 
   response.assertStatus(404);
->>>>>>> cadastro
 });
