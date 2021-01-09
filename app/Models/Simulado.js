@@ -1,11 +1,55 @@
+/* eslint-disable guard-for-in */
+/* eslint-disable no-restricted-syntax */
 /** @type {typeof import('@adonisjs/lucid/src/Lucid/Model')} */
 const Model = use('Model');
 
 /** @type {typeof import('@adonisjs/lucid/src/Lucid/Model')} */
 const Question = use('App/Models/Question');
 
+/** @type {typeof import('@adonisjs/lucid/src/Lucid/Model')} */
+const Answer = use('App/Models/Answer');
+
 class Simulado extends Model {
-  async enem(idQuestao) {
+  async enem(idQuestao, idioma) {
+    let countIngles;
+    let countEspanhol;
+
+    if (idioma === 'Ing') {
+      countIngles = 5;
+      countEspanhol = 0;
+    } else {
+      countIngles = 0;
+      countEspanhol = 5;
+    }
+
+    const MInhasFrentes = [
+      ['Botânica e ecologia', 'BotEco', 5],
+      ['Fisiologia animal e origem da vida', 'FisOri', 5],
+      ['Metabolismo celular, Bioquímica e Genética', 'MetBioGen', 5],
+      ['Eletromagnetismo', 'Electro', 5],
+      ['Mecânica', 'Mec', 5],
+      ['Óptica e Térmica', 'OptTer', 5],
+      ['Aritmética e Algebra', 'AriAlg', 15],
+      ['Financeira e Trigonometria', 'FinTri', 15],
+      ['Geometria', 'Geo', 15],
+      ['Físico-Química', 'FisQui', 5],
+      ['Química Geral', 'QuiGeral', 5],
+      ['Química Orgânica', 'QuiOrg', 5],
+      ['Atualidade', 'Atual', 5],
+      ['Filosofia', 'Filo', 5],
+      ['Sociologia', 'Socio', 5],
+      ['Geografia do Brasil', 'GeoBrasil', 7],
+      ['Geografia Geral', 'GeoGeral', 8],
+      ['História do Brasil', 'HistBrasil', 7],
+      ['História Geral', 'HistGeral', 8],
+      ['Artes', 'Artes', 3],
+      ['Espanhol', 'Esp', countEspanhol],
+      ['Gramática', 'Gram', 15],
+      ['Inglês', 'Ingles', countIngles],
+      ['Literatura', 'Literatura', 15],
+      ['Leitura e Produção de Texto', 'LeiProd', 7],
+    ];
+
     let myQuestion = {
       // 15
       BotEco: [],
@@ -64,27 +108,30 @@ class Simulado extends Model {
 
     await Promise.all(results.map((elem) => elem()));
 
-    // Biologia
+    const cadastraQuestoes = [];
 
-    const myquest = await Question.query()
-      .where('frente', 'Botânica e ecologia')
-      .limit(5 - myQuestion.BotEco.length)
-      .orderBy('quantity_test', 'difficulty', 'quantity')
-      .fetch();
+    MInhasFrentes.map((frentes) => {
+      cadastraQuestoes.push(async () => {
+        const MinhasQuestoes = await Question.query()
+          .where('frente', frentes[0])
+          .whereNotIn('id', myQuestion[frentes[1]])
+          .limit(frentes[2] - myQuestion[frentes[1]].length)
+          .orderBy('quantity_test', 'difficulty', 'quantity')
+          .fetch();
 
-    myquest.toJSON().map(async (elem) => {
-      myQuestion = await this.ordernarQuestoes(
-        elem.id,
-        myQuestion,
-        elem.frente
-      );
-      console.log(elem.quantity_test);
-      await Question.query()
-        .where('id', elem.id)
-        .update('quantity_test', elem.quantity_test + 1);
+        MinhasQuestoes.toJSON().map(async (elem) => {
+          myQuestion = await this.ordernarQuestoes(
+            elem.id,
+            myQuestion,
+            elem.frente
+          );
+        });
+      });
     });
 
-    console.log(myQuestion);
+    await Promise.all(cadastraQuestoes.map((elem) => elem()));
+
+    return JSON.stringify(myQuestion);
   }
 
   async ordernarQuestoes(id, myQuestion, frente) {
@@ -162,12 +209,75 @@ class Simulado extends Model {
         myQuestion.Literatura.push(id);
         break;
       case 'Leitura e Produção de Texto':
-        myQuestion.LeiProd.concat(id);
+        myQuestion.LeiProd.push(id);
         break;
       default:
         break;
     }
     return myQuestion;
+  }
+
+  async constroiQuestao(idQuestao) {
+    const minhaQuestao = await Question.findBy('id', idQuestao);
+
+    const answerQuestion = await Answer.query()
+      .where('question_id', minhaQuestao.toJSON().id)
+      .fetch();
+
+    const arrayAnswer = [
+      {
+        id: answerQuestion.toJSON()[0].id,
+        answer: answerQuestion.toJSON()[0].answer,
+      },
+      {
+        id: answerQuestion.toJSON()[1].id,
+        answer: answerQuestion.toJSON()[1].answer,
+      },
+      {
+        id: answerQuestion.toJSON()[2].id,
+        answer: answerQuestion.toJSON()[2].answer,
+      },
+      {
+        id: answerQuestion.toJSON()[3].id,
+        answer: answerQuestion.toJSON()[3].answer,
+      },
+      {
+        id: answerQuestion.toJSON()[4].id,
+        answer: answerQuestion.toJSON()[4].answer,
+      },
+    ];
+
+    const MyQuestionReturn = {
+      id_question: minhaQuestao.toJSON().id,
+      question: minhaQuestao.toJSON().question,
+      Area: minhaQuestao.toJSON().enemArea,
+      subjects: minhaQuestao.toJSON().subjects,
+      frente: minhaQuestao.toJSON().frente,
+      answer: arrayAnswer,
+    };
+
+    return MyQuestionReturn;
+  }
+
+  async constroiSimulado(meuSimulado) {
+    const results = [];
+
+    const arrayQuestao = [];
+
+    const IdsQuestion = JSON.parse(meuSimulado.questions_ids);
+
+    for (const key in IdsQuestion) {
+      IdsQuestion[key].map((elem) => {
+        results.push(async () => {
+          const Questao = await this.constroiQuestao(elem);
+          arrayQuestao.push(Questao);
+        });
+      });
+    }
+
+    await Promise.all(results.map((func) => func()));
+
+    return arrayQuestao;
   }
 }
 

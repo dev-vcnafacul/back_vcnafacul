@@ -11,12 +11,6 @@ const TipoSimulado = use('App/Models/TipoSimulado');
 
 /** @type {typeof import('@adonisjs/lucid/src/Lucid/Model')} */
 const Simulado = use('App/Models/Simulado');
-
-/** @type {typeof import('@adonisjs/lucid/src/Lucid/Model')} */
-const Question = use('App/Models/Question');
-
-/** @type {typeof import('@adonisjs/lucid/src/Lucid/Model')} */
-const Answer = use('App/Models/Answer');
 class SimuladoController {
   /**
    * Show a list of all simulados.
@@ -48,24 +42,40 @@ class SimuladoController {
    * @param {View} ctx.view
    */
   async create({ request, response }) {
-    const { nome, tipo, idQuestoes } = request.only([
+    const { nome, tipo, idQuestoes, idioma } = request.only([
       'nome',
       'tipo',
       'idQuestoes',
+      'idioma',
     ]);
 
     const NewSimulado = new Simulado();
 
-    const simulado = await TipoSimulado.query().where('id', tipo).fetch();
+    const simulado = await TipoSimulado.findByOrFail('id', tipo);
 
-    switch (simulado.toJSON()[0].tipo) {
+    const meutipo = simulado.toJSON().tipo;
+
+    let minhasQuestoes;
+
+    switch (meutipo) {
       case 'Enem':
-        await NewSimulado.enem(idQuestoes);
+        minhasQuestoes = await NewSimulado.enem(JSON.parse(idQuestoes), idioma);
         break;
-      case 'Generico':
-        await NewSimulado.genereico(idQuestoes);
       default:
         break;
+    }
+
+    try {
+      const data = {
+        name: nome,
+        tipo_simulados_id: tipo,
+        questions_ids: minhasQuestoes,
+      };
+
+      await Simulado.create(data);
+      return response.status(200).json({ msg: 'Simulado Criado' });
+    } catch (err) {
+      return response.status(404).json({ msg: err });
     }
   }
 
@@ -77,7 +87,17 @@ class SimuladoController {
    * @param {Request} ctx.request
    * @param {Response} ctx.response
    */
-  async store({ request, response }) {}
+  async store({ request, response }) {
+    const { id } = request.only(['id']);
+
+    const NewSimulado = new Simulado();
+
+    const meuSimulado = await NewSimulado.constroiSimulado(
+      await Simulado.findByOrFail('id', id)
+    );
+
+    return response.status(200).json({ meuSimulado });
+  }
 
   /**
    * Display a single simulado.

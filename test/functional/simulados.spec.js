@@ -1,5 +1,9 @@
+/* eslint-disable no-restricted-syntax */
+/* eslint-disable guard-for-in */
 const { after, before, test, trait } = use('Test/Suite')('Simulados');
+const { ar } = require('date-fns/locale');
 const faker = require('faker');
+const Simulado = require('../../app/Models/Simulado');
 
 /** @type {typeof import('@adonisjs/lucid/src/Lucid/Model')} */
 const Exam = use('App/Models/Exam');
@@ -143,7 +147,16 @@ test('Registrar um tipo de Simulado', async ({ assert, client }) => {
   assert.isNotNull(Enem);
 });
 
-test('Criar um Simulado', async ({ assert, client }) => {
+/* O teste abaixo testa a criação de Simulados,
+ entretanto ele requer uma quantidade grande 
+ de cadastro de questoes e nem sem a forma de
+  cadastro permite o teste passar, logo o teste
+   esta comentado */
+
+test('Criar um Simulado e construir um Simulado', async ({
+  assert,
+  client,
+}) => {
   const token = await login(client, true);
 
   const simulate = {
@@ -151,24 +164,28 @@ test('Criar um Simulado', async ({ assert, client }) => {
     quantidade_questoes: 90,
   };
 
-  await client
+  const registersimulate = await client
     .post('/registersimulate')
     .send(simulate)
     .header('Authorization', `Bearer ${token}`)
     .end();
 
+  registersimulate.assertStatus(200);
+
   let array = [];
-  const numberQuestion = 200;
+  const numberQuestion = 20;
   for (let i = 0; i < numberQuestion; i += 1) {
     const qt = createquestion();
     array = array.concat(qt);
   }
 
-  await client
+  const registerquestion = await client
     .post('/registerquestion')
     .send(array)
     .header('Authorization', `Bearer ${token}`)
     .end();
+
+  registerquestion.assertStatus(200);
 
   const newstatus = 'aprovada';
 
@@ -185,10 +202,12 @@ test('Criar um Simulado', async ({ assert, client }) => {
 
   await Promise.all(results.map((elem) => elem()));
 
-  const Newquestion = await Question.findBy(
-    'id',
-    Math.floor(Math.random() * numberQuestion)
-  );
+  const idFake = Math.floor(Math.random() * numberQuestion);
+
+  assert.isAbove(idFake, 0);
+  assert.isBelow(idFake, numberQuestion + 1);
+
+  const Newquestion = await Question.findBy('id', idFake);
 
   assert.equal(Newquestion.toJSON().status, newstatus);
 
@@ -197,16 +216,32 @@ test('Criar um Simulado', async ({ assert, client }) => {
     .send({
       nome: 'Meu Simulado',
       tipo: 1,
-      idQuestoes: [1, 3, 6],
+      idQuestoes: JSON.stringify([1, 3, 6]),
+      idioma: 'Ing',
     })
     .header('Authorization', `Bearer ${token}`)
     .end();
 
-  meuSimuladoResponse.assertStatus(204);
+  meuSimuladoResponse.assertStatus(200);
 
-  const myquestteste = await Question.query()
-    .where('frente', 'Botânica e ecologia')
-    .fetch();
+  const meuSimulado = await Simulado.findByOrFail('id', 1);
 
-  console.log(myquestteste.toJSON());
-});
+  const minhasQuestoes = JSON.parse(meuSimulado.toJSON().questions_ids);
+
+  let count = 0;
+
+  for (const key in minhasQuestoes) {
+    count += minhasQuestoes[key].length;
+  }
+
+  // console.log(count);
+  assert.isBelow(count, 180);
+
+  const responseConstroiSimulado = await client
+    .post('/constroisimulado')
+    .send({ id: 1 })
+    .header('Authorization', `Bearer ${token}`)
+    .end();
+
+  responseConstroiSimulado.assertStatus(200);
+}).timeout(30000);
