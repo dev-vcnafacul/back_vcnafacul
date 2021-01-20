@@ -37,3 +37,29 @@ test('it not should login in aplication', async ({ assert, client }) => {
 
   response.assertStatus(401);
 });
+
+test('it not should login in aplication', async ({ assert, client }) => {
+  const sessionPaylod = {
+    email: 'fernando.almeida.pinto@gmail.com',
+    password: '123456',
+  };
+
+  await Factory.model('App/Models/User').create(sessionPaylod);
+
+  const responseUser = await client
+    .post('/session')
+    .send({
+      email: sessionPaylod.email,
+      password: sessionPaylod.password,
+    })
+    .end();
+
+  const { token } = responseUser.body.token;
+
+  const response = await client
+    .get('/me')
+    .header('Authorization', `Bearer ${token}`)
+    .end();
+
+  console.log(response.body);
+});

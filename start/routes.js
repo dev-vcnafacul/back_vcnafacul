@@ -19,6 +19,8 @@ Route.post('/register', 'RegisterController.store');
 Route.post('/forgot', 'ForgotPasswordController.store');
 Route.post('/reset', 'ResetPasswordController.store');
 
+Route.get('/me', 'SessionController.me').middleware(['auth']);
+
 Route.post('/registerquestion', 'QuestionController.store').middleware([
   'auth',
 ]);
