@@ -19,7 +19,9 @@ class SessionController {
 
     const token = await auth.attempt(data.email, data.password);
 
-    return { token };
+    const user = await User.findBy('email', data.email);
+
+    return { token, firstName: user.firstName, isTeacher: user.isTeacher };
   }
 
   async me({ auth, response }) {
