@@ -40,6 +40,25 @@ class SessionController {
 
     return response.status(200).json({ msg: myreturn });
   }
+
+  async patchMe({ auth, request, response }) {
+    const user = await User.findByOrFail('id', auth.user.id);
+
+    const data = request.all();
+
+    user.firstName = data.firstName || user.firstName;
+    user.lastName = data.lastName || user.lastName;
+    user.phone = data.phone || user.phone;
+    user.gender = data.gender || user.gender;
+    user.birthday = data.birthday || user.birthday;
+    user.state = data.state || user.state;
+    user.city = data.city || user.city;
+    user.about = data.about || user.about;
+
+    await user.save();
+
+    return response.status(200).json({ msg: 'editado' });
+  }
 }
 
 module.exports = SessionController;
