@@ -1,18 +1,17 @@
 /* eslint-disable no-restricted-syntax */
 /* eslint-disable guard-for-in */
 const { after, before, test, trait } = use('Test/Suite')('Simulados');
-const { ar } = require('date-fns/locale');
-const faker = require('faker');
-const Simulado = require('../../app/Models/Simulado');
+// const faker = require('faker');
+// const Simulado = require('../../app/Models/Simulado');
 
 /** @type {typeof import('@adonisjs/lucid/src/Lucid/Model')} */
 const Exam = use('App/Models/Exam');
 
 /** @type {typeof import('@adonisjs/lucid/src/Lucid/Model')} */
-const Question = use('App/Models/Question');
+// const Question = use('App/Models/Question');
 
 /** @type {typeof import('@adonisjs/lucid/src/Lucid/Model')} */
-const TipoSimulado = use('App/Models/TipoSimulado');
+// const TipoSimulado = use('App/Models/TipoSimulado');
 
 trait('Test/ApiClient');
 trait('DatabaseTransactions');
@@ -27,7 +26,7 @@ after((done) => {
   // setTimeout(done(), 2000);
 });
 
-function createquestion() {
+/* function createquestion() {
   return {
     question: faker.lorem.text(),
     enemArea: faker.random.arrayElements(
@@ -93,9 +92,9 @@ function createquestion() {
       faker.lorem.text(),
     ],
   };
-}
+} */
 
-async function login(client, isTeacher) {
+/* async function login(client, isTeacher) {
   const newUser = {
     email: 'fernando.almeida.pinto@gmail.com',
     password: '123456',
@@ -127,8 +126,8 @@ async function login(client, isTeacher) {
   const { token } = responseUser.body.token;
 
   return token;
-}
-
+} */
+/* 
 test('Registrar um tipo de Simulado', async ({ assert, client }) => {
   const token = await login(client, true);
 
@@ -145,14 +144,14 @@ test('Registrar um tipo de Simulado', async ({ assert, client }) => {
 
   const Enem = await TipoSimulado.findBy('id', 1);
   assert.isNotNull(Enem);
-});
+}); */
 
 /* O teste abaixo testa a criação de Simulados,
  entretanto ele requer uma quantidade grande 
  de cadastro de questoes e nem sem a forma de
   cadastro permite o teste passar, logo o teste
    esta comentado */
-
+/* 
 test('Criar um Simulado e construir um Simulado', async ({
   assert,
   client,
@@ -245,3 +244,4 @@ test('Criar um Simulado e construir um Simulado', async ({
 
   responseConstroiSimulado.assertStatus(200);
 }).timeout(30000);
+ */

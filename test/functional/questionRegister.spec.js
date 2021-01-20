@@ -1,4 +1,4 @@
-const faker = require('faker');
+// const faker = require('faker');
 
 const { test, trait, after, before } = use('Test/Suite')('Question Register');
 
@@ -9,7 +9,7 @@ trait('DatabaseTransactions');
 const Exam = use('App/Models/Exam');
 
 /** @type {typeof import('@adonisjs/lucid/src/Lucid/Model')} */
-const Question = use('App/Models/Question');
+// const Question = use('App/Models/Question');
 
 // Preparando definição antes de começar os testes
 
@@ -21,7 +21,7 @@ after((done) => {
   done();
 });
 
-function createquestion() {
+/* function createquestion() {
   return {
     question: faker.lorem.text(),
     enemArea: faker.random.arrayElements(
@@ -87,9 +87,9 @@ function createquestion() {
       faker.lorem.text(),
     ],
   };
-}
+} */
 
-async function login(client, isTeacher) {
+/* async function login(client, isTeacher) {
   const newUser = {
     email: 'fernando.almeida.pinto@gmail.com',
     password: '123456',
@@ -121,10 +121,10 @@ async function login(client, isTeacher) {
   const { token } = responseUser.body.token;
 
   return token;
-}
+} */
 
 // Testes de fato começam aqui
-
+/* 
 test('it should register n questions being a teacher', async ({ client }) => {
   // chama uma função que cadastra e faz o login
 
@@ -238,4 +238,4 @@ test('it should change status question from pendente to aprovada/reprovada', asy
   const Newquestion = await Question.findByOrFail('id', 1);
 
   assert.equal(Newquestion.toJSON().status, newstatus);
-});
+}); */
