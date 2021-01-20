@@ -1,3 +1,6 @@
+const { randomBytes } = require('crypto');
+const { promisify } = require('util');
+
 /** @type {typeof import('@adonisjs/lucid/src/Lucid/Model')} */
 const Question = use('App/Models/Question');
 
@@ -5,12 +8,13 @@ const Question = use('App/Models/Question');
 const Permission = use('App/Models/Permission');
 
 /** @type {typeof import('@adonisjs/lucid/src/Lucid/Model')} */
-const Answer = use('App/Models/Answer');
+// const Answer = use('App/Models/Answer');
 
 /** @type {typeof import('@adonisjs/lucid/src/Lucid/Model')} */
-const Exam = use('App/Models/Exam');
+// const Exam = use('App/Models/Exam');
 
 const { validate } = use('Validator');
+const Helpers = use('Helpers');
 
 /**
   @typedef {import('@adonisjs/framework/src/Request')} Request
@@ -39,11 +43,11 @@ class QuestionController {
   // Essa requisição é responsável por cadastro de questões.
   // Verificar quem tem atribuição de cadastro. Para isso Olhar na Tabela de Permissões.
 
-  async store({ request, auth, response }) {
+  /*   async store({ request, auth, response }) {
     const Pm = await Permission.query().where('user_id', auth.user.id).fetch();
     const perm = Pm.toJSON();
     if (perm.cadastroQuestao === 0) {
-      return response.status(200).json({ error: 'Not Authorization' });
+      return response.status(401).json({ error: 'Not Authorization' });
     }
 
     let qtError = [];
@@ -157,7 +161,7 @@ class QuestionController {
       })
     );
     return ArrayQuestion;
-  }
+  } */
 
   async changestatusquestion({ auth, params, response }) {
     if (!this.PermissionVerification(auth, 'aprovarQuestoes')) {
@@ -170,6 +174,72 @@ class QuestionController {
     await Question.query().where('id', id).update({ status });
     response.status(200);
     return { message: 'Sucess' };
+  }
+
+  async newStore({ request, auth, response }) {
+    if (!this.PermissionVerification(auth, 'aprovarQuestoes')) {
+      response.status(404);
+      return { error: 'Not authorization' };
+    }
+
+    const { enemArea, subjects, frente, year, examId, correct } = request.only([
+      'enemArea',
+      'subjects',
+      'year',
+      'exameId',
+      'frente',
+      'correct',
+    ]);
+
+    const question = request.file('question', {
+      types: ['image'],
+      size: '0.2mb',
+    });
+
+    const random = await promisify(randomBytes)(1);
+    const name = random.toString('hex');
+
+    const rulesQuestion = {
+      user_id: 'required|integer',
+      question: 'required|string',
+      enemArea: 'required|string',
+      subjects: 'required|string',
+      year: 'required|integer',
+      examId: 'required|integer',
+      frente: 'required|string',
+      correct: 'required|string',
+    };
+
+    const qt = {
+      user_id: auth.user.id,
+      question: name,
+      enemArea,
+      subjects,
+      frente,
+      year,
+      examId,
+      correct,
+    };
+
+    const validation = await validate(qt, rulesQuestion);
+
+    if (validation.fails()) {
+      const error = validation.messages();
+      response.status(400);
+      return { msg: error };
+    }
+
+    await question.move(Helpers.tmpPath('uploadsQuestion'), {
+      name: `${name}.jpg`,
+      overwrite: true,
+    });
+
+    if (!question.moved()) {
+      response.status(404);
+      return question.error();
+    }
+
+    await Question.create(qt);
   }
 }
 

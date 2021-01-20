@@ -22,7 +22,7 @@ class QuestionsSchema extends Schema {
         .onUpdate('CASCADE')
         .onDelete('CASCADE');
       // Pergunta
-      table.text('question', ['mediumtext']).notNullable();
+      table.string('question').notNullable();
       // Areas do Enem, uma boa forma de entender a pergunta
       table
         .enum('enemArea', [
@@ -120,6 +120,7 @@ class QuestionsSchema extends Schema {
       table
         .enum('status', ['aprovada', 'reprovada', 'pendente'])
         .default('pendente');
+      table.enum('correct', ['A', 'B', 'C', 'D', 'E']).notNullable();
       table.timestamps();
     });
   }
