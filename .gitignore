@@ -8,4 +8,4 @@ tmp
 database/*.sqlite
 
 #env
-#.env
+.env
