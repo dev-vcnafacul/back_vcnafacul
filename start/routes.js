@@ -23,6 +23,8 @@ Route.get('/me', 'SessionController.me').middleware(['auth']);
 Route.patch('/patchme', 'SessionController.patchMe').middleware(['auth']);
 
 Route.post('/newexam', 'QuestionController.newExame').middleware(['auth']);
+Route.get('/allexam', 'QuestionController.getAllExame');
+
 Route.post('/registerquestion', 'QuestionController.newStore').middleware([
   'auth',
 ]);

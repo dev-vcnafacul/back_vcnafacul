@@ -22,7 +22,7 @@ class QuestionsSchema extends Schema {
         .onUpdate('CASCADE')
         .onDelete('CASCADE');
       // Pergunta
-      table.string('question').notNullable();
+      table.string('question').notNullable().unique();
       // Areas do Enem, uma boa forma de entender a pergunta
       table
         .enum('enemArea', [

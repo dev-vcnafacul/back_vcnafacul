@@ -164,7 +164,7 @@ class QuestionController {
   } */
 
   async changestatusquestion({ auth, params, response }) {
-    if (!this.PermissionVerification(auth, 'aprovarQuestoes')) {
+    if (await !this.PermissionVerification(auth, 'aprovarQuestoes')) {
       response.status(404);
       return { error: 'Not authorization' };
     }
@@ -177,7 +177,7 @@ class QuestionController {
   }
 
   async newStore({ request, auth, response }) {
-    if (!this.PermissionVerification(auth, 'aprovarQuestoes')) {
+    if (await !this.PermissionVerification(auth, 'cadastroQuestao')) {
       response.status(404);
       return { error: 'Not authorization' };
     }
@@ -191,6 +191,16 @@ class QuestionController {
       'correct',
     ]);
 
+    const myExam = await Exam.findBy('id', examId);
+
+    if (myExam === null) {
+      return response
+        .status(400)
+        .json({ msg: 'O Exame selecionado não encontrado em nossa base' });
+    }
+
+    const exameId = myExam.toJSON().id;
+
     const question = request.file('question', {
       types: ['image'],
       size: '0.2mb',
@@ -200,13 +210,13 @@ class QuestionController {
     const name = random.toString('hex');
 
     const rulesQuestion = {
-      user_id: 'required|integer',
-      question: 'required|string',
+      user_id: 'required|number',
       enemArea: 'required|string',
+      question: 'required|string',
       subjects: 'required|string',
       year: 'required|integer',
-      examId: 'required|integer',
       frente: 'required|string',
+      examId: 'required|number',
       correct: 'required|string',
     };
 
@@ -217,7 +227,7 @@ class QuestionController {
       subjects,
       frente,
       year,
-      examId,
+      exameId,
       correct,
     };
 
@@ -243,6 +253,11 @@ class QuestionController {
   }
 
   async newExame({ request, auth, response }) {
+    const CanI = await this.PermissionVerification(auth, 'cadastroexame');
+
+    if (!CanI) {
+      return response.status(404).json({ error: 'Not authorization' });
+    }
     const data = request.only(['exam', 'location']);
 
     const existedExame = await Exam.findBy('exam', data.exam);
@@ -262,6 +277,12 @@ class QuestionController {
     return response
       .status(200)
       .json({ msg: `Exame ${data.exam} cadastrado com sucesso` });
+  }
+
+  async getAllExame({ response }) {
+    const allExame = await Exam.all();
+
+    return response.status(200).json(allExame.toJSON());
   }
 }
 

@@ -47,6 +47,7 @@ class User extends Model {
         cadastroQuestao: true,
         buscarQuestoes: true,
         aprovarQuestoes: true,
+        cadastroexame: true,
       };
     }
     return {};
