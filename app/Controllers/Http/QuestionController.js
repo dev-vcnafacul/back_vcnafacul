@@ -11,7 +11,7 @@ const Permission = use('App/Models/Permission');
 // const Answer = use('App/Models/Answer');
 
 /** @type {typeof import('@adonisjs/lucid/src/Lucid/Model')} */
-// const Exam = use('App/Models/Exam');
+const Exam = use('App/Models/Exam');
 
 const { validate } = use('Validator');
 const Helpers = use('Helpers');
@@ -185,9 +185,9 @@ class QuestionController {
     const { enemArea, subjects, frente, year, examId, correct } = request.only([
       'enemArea',
       'subjects',
+      'frente',
       'year',
       'exameId',
-      'frente',
       'correct',
     ]);
 
@@ -240,6 +240,28 @@ class QuestionController {
     }
 
     await Question.create(qt);
+  }
+
+  async newExame({ request, auth, response }) {
+    const data = request.only(['exam', 'location']);
+
+    const existedExame = await Exam.findBy('exam', data.exam);
+
+    if (existedExame !== null) {
+      return response.status(400).json({ msg: 'Exame já existe' });
+    }
+
+    const myExam = {
+      user_id: auth.user.id,
+      exam: data.exam,
+      location: data.location,
+    };
+
+    await Exam.create(myExam);
+
+    return response
+      .status(200)
+      .json({ msg: `Exame ${data.exam} cadastrado com sucesso` });
   }
 }
 
