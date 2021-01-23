@@ -59,7 +59,20 @@ class SessionController {
 
     await user.save();
 
-    return response.status(200).json({ msg: 'editado' });
+    const myreturn = {
+      email: user.email,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      phone: user.phone,
+      gender: user.gender,
+      birthday: user.birthday,
+      state: user.state,
+      city: user.city,
+      isTeacher: user.isTeacher,
+      about: user.about,
+    };
+
+    return response.status(200).json({ msg: myreturn });
   }
 }
 
