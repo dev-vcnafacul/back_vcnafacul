@@ -23,6 +23,12 @@ class RegisterController {
   async store({ request, response }) {
     const data = request.all();
 
+    const existedEmail = await User.findBy('email', data.email);
+
+    if (existedEmail !== null) {
+      return response.status(409).json({ msg: 'Email já existe' });
+    }
+
     const rulesUser = {
       email: 'required',
       password: 'required',
@@ -30,7 +36,7 @@ class RegisterController {
       lastName: 'required',
       phone: 'required',
       gender: 'required',
-      birthday: 'required',
+      birthday: 'required|date',
       state: 'required',
       city: 'required',
       isTeacher: 'required|boolean',
