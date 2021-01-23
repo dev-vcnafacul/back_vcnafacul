@@ -22,7 +22,7 @@ Route.post('/reset', 'ResetPasswordController.store');
 Route.get('/me', 'SessionController.me').middleware(['auth']);
 Route.patch('/patchme', 'SessionController.patchMe').middleware(['auth']);
 
-Route.post('/registerquestion', 'QuestionController.store').middleware([
+Route.post('/registerquestion', 'QuestionController.newStore').middleware([
   'auth',
 ]);
 
