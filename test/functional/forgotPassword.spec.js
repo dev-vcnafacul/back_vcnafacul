@@ -76,7 +76,6 @@ test('it should reset password after 2h of forgot password request', async ({
     .send({
       token: userToken.token,
       password: '123456',
-      password_confirmation: '123456',
     })
     .end();
 
@@ -91,5 +90,5 @@ test('it send a email invalid', async ({ client }) => {
     .send({ email: 'fernando.almeida.pinto@gmail.com' })
     .end();
 
-  response.assertStatus(404);
+  response.assertStatus(409);
 });

@@ -14,7 +14,7 @@ test('it should register a new student', async ({ client, assert }) => {
     lastName: 'Almeida',
     phone: '(xx)9xxxx-xxxx',
     gender: 'Male',
-    birthday: '26/06/1989',
+    birthday: '1989-06-26',
     state: 'SP',
     city: 'São Paulo',
     isTeacher: false,
@@ -41,7 +41,7 @@ test('register missing the city', async ({ client, assert }) => {
     lastName: 'Almeida',
     phone: '11966530488',
     gender: 'Male',
-    birthday: '26/06/1989',
+    birthday: '1989-06/26',
     state: 'SP',
     isTeacher: false,
   };

@@ -8,10 +8,14 @@ const Env = use('Env');
 const User = use('App/Models/User');
 
 class ForgotPasswordController {
-  async store({ request }) {
+  async store({ request, response }) {
     const { email } = request.only('email');
 
-    const user = await User.findByOrFail('email', email);
+    const user = await User.findBy('email', email);
+
+    if (user === null) {
+      return response.status(409).json({ msg: 'Email não existe' });
+    }
 
     const random = await promisify(randomBytes)(24);
     const token = random.toString('hex');
