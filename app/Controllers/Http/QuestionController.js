@@ -199,7 +199,7 @@ class QuestionController {
         .json({ msg: 'O Exame selecionado não encontrado em nossa base' });
     }
 
-    const question = request.file('question', {
+    const myImage = request.file('question', {
       types: ['image'],
       size: '0.1mb',
     });
@@ -233,18 +233,17 @@ class QuestionController {
 
     if (validation.fails()) {
       const error = validation.messages();
-      response.status(400);
-      return { msg: error };
+      return response.status(400).json({ msg: error });
     }
 
-    await question.move(Helpers.tmpPath('uploadsQuestion'), {
+    await myImage.move('uploads', {
       name: `${name}.jpg`,
-      overwrite: true,
+      overwrite: false,
     });
 
-    if (!question.moved()) {
+    if (!myImage.moved()) {
       response.status(404);
-      return question.error();
+      return myImage.error();
     }
 
     await Question.create(qt);
@@ -256,18 +255,6 @@ class QuestionController {
     return response.status(200).json(allQuestion.toJSON());
   }
 
-  async getIdQuestion({ params }) {
-    const myQuestion = await Question.findBy('id', params.id);
-
-    const InstQuestion = new Question();
-
-    const fileStream = await InstQuestion.responseFileStream(
-      myQuestion.toJSON().question
-    );
-
-    console.log(fileStream);
-  }
-
   async newExame({ request, auth, response }) {
     const CanI = await this.PermissionVerification(auth, 'cadastroexame');
 
@@ -276,7 +263,7 @@ class QuestionController {
     }
     const data = request.only(['exam', 'location']);
 
-    const existedExame = await Exam.findBy('exam', data.exam);
+    const existedExame = await Exam.findBy('exam', data.exam.toUpperCase());
 
     if (existedExame !== null) {
       return response.status(400).json({ msg: 'Exame já existe' });

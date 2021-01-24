@@ -11,12 +11,6 @@ class Question extends Model {
   answer() {
     return this.hasMany('App/Models/Answer');
   }
-
-  responseFileStream(namefileQuestion) {
-    const mypath = `${path.resolve('./')}/tmp/uploadsQuestion/`;
-    const readStream = fs.createReadStream(`${mypath}${namefileQuestion}.jpg`);
-    return readStream;
-  }
 }
 
 module.exports = Question;
