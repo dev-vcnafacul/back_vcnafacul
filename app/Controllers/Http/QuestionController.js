@@ -187,7 +187,7 @@ class QuestionController {
       'subjects',
       'frente',
       'year',
-      'exameId',
+      'examId',
       'correct',
     ]);
 
@@ -199,14 +199,12 @@ class QuestionController {
         .json({ msg: 'O Exame selecionado não encontrado em nossa base' });
     }
 
-    const exameId = myExam.toJSON().id;
-
     const question = request.file('question', {
       types: ['image'],
-      size: '0.2mb',
+      size: '0.1mb',
     });
 
-    const random = await promisify(randomBytes)(1);
+    const random = await promisify(randomBytes)(16);
     const name = random.toString('hex');
 
     const rulesQuestion = {
@@ -227,7 +225,7 @@ class QuestionController {
       subjects,
       frente,
       year,
-      exameId,
+      examId,
       correct,
     };
 
@@ -250,6 +248,24 @@ class QuestionController {
     }
 
     await Question.create(qt);
+    return response.status(200).json({ msg: 'Questão Cadastrada' });
+  }
+
+  async getAllQuestion({ response }) {
+    const allQuestion = await Question.all();
+    return response.status(200).json(allQuestion.toJSON());
+  }
+
+  async getIdQuestion({ params }) {
+    const myQuestion = await Question.findBy('id', params.id);
+
+    const InstQuestion = new Question();
+
+    const fileStream = await InstQuestion.responseFileStream(
+      myQuestion.toJSON().question
+    );
+
+    console.log(fileStream);
   }
 
   async newExame({ request, auth, response }) {

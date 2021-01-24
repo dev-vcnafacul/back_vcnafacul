@@ -29,6 +29,14 @@ Route.post('/registerquestion', 'QuestionController.newStore').middleware([
   'auth',
 ]);
 
+Route.get('/getallquestion', 'QuestionController.getAllQuestion').middleware([
+  'auth',
+]);
+
+Route.get('/idquestion/:id', 'QuestionController.getIdQuestion').middleware([
+  'auth',
+]);
+
 Route.post('/showquestion', 'QuestionController.show').middleware(['auth']);
 
 Route.patch(
