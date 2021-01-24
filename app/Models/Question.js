@@ -1,3 +1,5 @@
+const fs = require('fs');
+const path = require('path');
 /** @type {typeof import('@adonisjs/lucid/src/Lucid/Model')} */
 const Model = use('Model');
 
@@ -10,8 +12,10 @@ class Question extends Model {
     return this.hasMany('App/Models/Answer');
   }
 
-  teste(a, b) {
-    return a + b;
+  responseFileStream(namefileQuestion) {
+    const mypath = `${path.resolve('./')}/tmp/uploadsQuestion/`;
+    const readStream = fs.createReadStream(`${mypath}${namefileQuestion}.jpg`);
+    return readStream;
   }
 }
 
