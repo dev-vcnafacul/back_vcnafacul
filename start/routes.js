@@ -22,7 +22,18 @@ Route.post('/reset', 'ResetPasswordController.store');
 Route.get('/me', 'SessionController.me').middleware(['auth']);
 Route.patch('/patchme', 'SessionController.patchMe').middleware(['auth']);
 
-Route.post('/registerquestion', 'QuestionController.store').middleware([
+Route.post('/newexam', 'QuestionController.newExame').middleware(['auth']);
+Route.get('/allexam', 'QuestionController.getAllExame').middleware(['auth']);
+
+Route.post('/registerquestion', 'QuestionController.newStore').middleware([
+  'auth',
+]);
+
+Route.get('/getallquestion', 'QuestionController.getAllQuestion').middleware([
+  'auth',
+]);
+
+Route.get('/idquestion/:id', 'QuestionController.getIdQuestion').middleware([
   'auth',
 ]);
 

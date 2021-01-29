@@ -16,6 +16,7 @@ class PermissionSchema extends Schema {
       table.boolean('cadastroQuestao').default(false);
       table.boolean('buscarQuestoes').default(false);
       table.boolean('aprovarQuestoes').default(false);
+      table.boolean('cadastroexame').default(false);
       table.timestamps();
     });
   }

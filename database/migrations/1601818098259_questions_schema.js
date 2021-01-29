@@ -22,14 +22,14 @@ class QuestionsSchema extends Schema {
         .onUpdate('CASCADE')
         .onDelete('CASCADE');
       // Pergunta
-      table.string('question').notNullable();
+      table.string('question').notNullable().unique();
       // Areas do Enem, uma boa forma de entender a pergunta
       table
         .enum('enemArea', [
           'Ciencias Humanas',
           'Ciencias da Natureza',
           'Linguagens',
-          'Matematica',
+          'Matemática',
         ])
         .notNullable();
       // Dificuldade da questão de 0 a 100
@@ -88,8 +88,6 @@ class QuestionsSchema extends Schema {
       table.integer('quantity').default(0).notNullable();
       // Quantidade de vezes que essa questão apareceu em simulados diferentes
       table.integer('quantity_test').default(0).notNullable();
-      // Possível imagem que pode ter a Pergunta
-      table.string('image');
       // Que ano
       table
         .enum('year', [
@@ -119,7 +117,7 @@ class QuestionsSchema extends Schema {
         .notNullable();
       table
         .enum('status', ['aprovada', 'reprovada', 'pendente'])
-        .default('pendente');
+        .default('aprovada');
       table.enum('correct', ['A', 'B', 'C', 'D', 'E']).notNullable();
       table.timestamps();
     });
